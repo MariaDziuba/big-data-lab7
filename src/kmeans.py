@@ -11,6 +11,7 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession
 from datamart import DataMart
 from create_tables import create_open_food_facts
+import loguru
 
 
 class KMeansClustering:
