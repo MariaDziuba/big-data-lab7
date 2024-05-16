@@ -20,6 +20,7 @@ class KMeansClustering:
         self.datamart = datamart
 
     def clustering(self, scaled_data):
+        loguru.logger.info("Clustering started")
         evaluator = ClusteringEvaluator(
             predictionCol='prediction',
             featuresCol='scaled_features',
@@ -33,7 +34,9 @@ class KMeansClustering:
             predictions = model.transform(scaled_data)
             self.datamart.write_predictions(predictions.select("prediction"))
             score = evaluator.evaluate(predictions)
-            print(f'k = {k}, silhouette score = {score}')
+            loguru.logger.info(f'k = {k}, silhouette score = {score}')
+
+        loguru.logger.info("Clustering finished")
 
 
 def main():
@@ -51,6 +54,8 @@ def main():
     spark = SparkSession.builder \
     .appName(config['spark']['app_name']) \
     .master(config['spark']['deploy_mode']) \
+    .config("spark.driver.host", "127.0.0.1")\
+    .config("spark.driver.bindAddress", "127.0.0.1") \
     .config("spark.driver.cores", config['spark']['driver_cores']) \
     .config("spark.executor.cores", config['spark']['executor_cores']) \
     .config("spark.driver.memory", config['spark']['driver_memory']) \
@@ -58,6 +63,8 @@ def main():
     .config("spark.jars", f"{sql_connector_path},jars/datamart.jar") \
     .config("spark.driver.extraClassPath", sql_connector_path) \
     .getOrCreate()
+
+    loguru.logger.info("Created a SparkSession object")
 
     datamart = DataMart(spark=spark, host=config['spark']['host'])
 
