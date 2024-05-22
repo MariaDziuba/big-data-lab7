@@ -1,6 +1,7 @@
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import preprocess.{Preprocessor}
 import db.{MySqlDatabase}
+import com.typesafe.scalalogging.Logger
 
 
 class DataMart(HOST: String) {
@@ -26,10 +27,13 @@ class DataMart(HOST: String) {
     .config("spark.driver.extraClassPath", MYSQL_CONNECTOR_JAR)
     .getOrCreate()
   private val db = new MySqlDatabase(session, HOST)
+  private val logger = Logger("Logger")
 
 
   def readPreprocessedOpenFoodFactsDataset(): DataFrame = {
     val data = db.readTable("OpenFoodFacts")
+    logger.info("The OpenFoodFacts table was successfully read")
+
     val transforms: Seq[DataFrame => DataFrame] = Seq(
       Preprocessor.fillNa,
       Preprocessor.assembleVector,
@@ -37,10 +41,12 @@ class DataMart(HOST: String) {
     )
 
     val transformed = transforms.foldLeft(data) { (df, f) => f(df) }
+    logger.info("All transforms were applied to the dataset")
     transformed
   }
 
   def writePredictions(df: DataFrame): Unit = {
     db.insertDf(df, "Predictions")
+    logger.info("All predictions were inserted in the Predictions table")
   }
 }

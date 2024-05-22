@@ -12,5 +12,7 @@ val sparkVersion = "3.5.1"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
-  "org.apache.spark" %% "spark-mllib" % sparkVersion
+  "org.apache.spark" %% "spark-mllib" % sparkVersion,
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3",
+  "ch.qos.logback" % "logback-classic" % "1.2.3"
 )

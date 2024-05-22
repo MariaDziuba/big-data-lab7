@@ -2,11 +2,18 @@ package preprocess
 
 import org.apache.spark.ml.feature.{StandardScaler, VectorAssembler}
 import org.apache.spark.sql.DataFrame
+import com.typesafe.scalalogging.Logger
 
 
 object Preprocessor {
 
-  def fillNa(df: DataFrame): DataFrame = df.na.fill(0.0)
+  private val logger = Logger("Logger")
+
+  def fillNa(df: DataFrame): DataFrame = {
+    val result = df.na.fill(0.0)
+    logger.info("Filled all NaN values with zeroes")
+    result
+  }
 
   def assembleVector(df: DataFrame): DataFrame = {
     val outputCol = "features"
@@ -18,7 +25,9 @@ object Preprocessor {
       .setInputCols(df.columns)
       .setOutputCol(outputCol)
       .setHandleInvalid("skip")
-    vector_assembler.transform(df)
+    val result = vector_assembler.transform(df)
+    logger.info("The dataset was assembled")
+    result
   }
 
   def scaleAssembledDataset(df: DataFrame): DataFrame = {
@@ -26,6 +35,8 @@ object Preprocessor {
       .setInputCol("features")
       .setOutputCol("scaled_features")
     val scalerModel = scaler.fit(df)
-    scalerModel.transform(df)
+    val result = scalerModel.transform(df)
+    logger.info("The dataset was scaled using StandardScaler")
+    result
   }
 }
