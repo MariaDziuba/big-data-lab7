@@ -51,5 +51,3 @@ def create_open_food_facts():
     db_cursor.execute("INSERT INTO OpenFoodFacts(completeness, energy_kcal_100g, energy_100g, \
                     fat_100g, saturated_fat_100g, carbohydrates_100g, sugars_100g, proteins_100g, \
                     salt_100g, sodium_100g) VALUES" + df_tuples_string + ';')
-
-    db_cursor.execute("FLUSH TABLES;")
