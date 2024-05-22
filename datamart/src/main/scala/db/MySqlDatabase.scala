@@ -3,8 +3,7 @@ package db
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 
-class MySqlDatabase(spark: SparkSession) {
-  private val HOST = "127.0.0.1"
+class MySqlDatabase(spark: SparkSession, HOST: String) {
   private val PORT = 3306
   private val DATABASE = "lab6"
   private val JDBC_URL = s"jdbc:mysql://$HOST:$PORT/$DATABASE"
