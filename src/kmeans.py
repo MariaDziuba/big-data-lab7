@@ -10,6 +10,7 @@ from pyspark.ml.clustering import KMeans
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession
 from datamart import DataMart
+from create_tables import create_open_food_facts
 
 
 class KMeansClustering:
@@ -35,8 +36,16 @@ class KMeansClustering:
 
 
 def main():
+
+    create_open_food_facts()
+
     config = configparser.ConfigParser()
     config.read('config.ini')
+
+    # .config("spark.driver.host", "127.0.0.1") \
+    # .config("spark.driver.bindAddress", "127.0.0.1") \
+    
+    sql_connector_path = os.path.join(cur_dir.parent.parent, config['spark']['mysql_connector_jar'])
 
     spark = SparkSession.builder \
     .appName(config['spark']['app_name']) \
@@ -45,11 +54,11 @@ def main():
     .config("spark.executor.cores", config['spark']['executor_cores']) \
     .config("spark.driver.memory", config['spark']['driver_memory']) \
     .config("spark.executor.memory", config['spark']['executor_memory']) \
-    .config("spark.jars", f"{config['spark']['mysql_connector_jar']},jars/datamart.jar") \
-    .config("spark.driver.extraClassPath", config['spark']['mysql_connector_jar']) \
+    .config("spark.jars", f"{sql_connector_path},jars/datamart.jar") \
+    .config("spark.driver.extraClassPath", sql_connector_path) \
     .getOrCreate()
 
-    datamart = DataMart(spark=spark)
+    datamart = DataMart(spark=spark, host=config['spark']['host'])
 
     assembled_data = datamart.read_dataset()
     kmeans = KMeansClustering(datamart)

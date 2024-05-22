@@ -3,7 +3,7 @@ import preprocess.{Preprocessor}
 import db.{MySqlDatabase}
 
 
-object DataMart {
+class DataMart(HOST: String) {
   private val USER = "root"
   private val PASSWORD = "password"
   private val APP_NAME = "KMeans"
@@ -16,6 +16,8 @@ object DataMart {
   val session = SparkSession.builder
     .appName(APP_NAME)
     .master(DEPLOY_MODE)
+    .config("spark.driver.host", HOST)
+    .config("spark.driver.bindAddress", HOST)
     .config("spark.driver.cores", DRIVER_CORES)
     .config("spark.executor.cores", EXECUTOR_CORES)
     .config("spark.driver.memory", DRIVER_MEMORY)
@@ -23,7 +25,7 @@ object DataMart {
     .config("spark.jars", MYSQL_CONNECTOR_JAR)
     .config("spark.driver.extraClassPath", MYSQL_CONNECTOR_JAR)
     .getOrCreate()
-  private val db = new MySqlDatabase(session)
+  private val db = new MySqlDatabase(session, HOST)
 
 
   def readPreprocessedOpenFoodFactsDataset(): DataFrame = {
