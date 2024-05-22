@@ -50,6 +50,7 @@ def main():
     # .config("spark.driver.bindAddress", "127.0.0.1") \
     
     sql_connector_path = os.path.join(cur_dir.parent.parent, config['spark']['mysql_connector_jar'])
+    scala_logging_path = os.path.join(cur_dir.parent.parent, config['spark']['scala_logging'])
 
     spark = SparkSession.builder \
     .appName(config['spark']['app_name']) \
@@ -60,7 +61,7 @@ def main():
     .config("spark.executor.cores", config['spark']['executor_cores']) \
     .config("spark.driver.memory", config['spark']['driver_memory']) \
     .config("spark.executor.memory", config['spark']['executor_memory']) \
-    .config("spark.jars", f"{sql_connector_path},jars/datamart.jar") \
+    .config("spark.jars", f"{sql_connector_path},jars/datamart.jar,{scala_logging_path}") \
     .config("spark.driver.extraClassPath", sql_connector_path) \
     .getOrCreate()
 
