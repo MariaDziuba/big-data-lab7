@@ -7,3 +7,26 @@ services:
     environment:
       - MYSQL_DATABASE=lab6
       - MYSQL_ROOT_PASSWORD=password
+
+  datamart:
+    container_name: datamart
+    build:
+      context: datamart/.
+      dockerfile: Dockerfile
+    ports:
+      - '9000:9000'
+    volumes:
+      - shared_data:/shared
+
+  spark:
+    container_name: spark
+    build:
+      context: src/.
+      dockerfile: Dockerfile
+    volumes:
+      - shared_data:/shared
+    depends_on:
+      - mysql
+      - datamart
+volumes:
+  shared_data:
